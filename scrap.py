@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup as soup
 import pandas as pd
 import datetime as dt
 from webdriver_manager.firefox import GeckoDriverManager
+import requests as re
 
 
 def scrape_all():
@@ -12,6 +13,7 @@ def scrape_all():
     browser = Browser('firefox', **executable_path, headless=True)
 
     news_title, news_paragraph = mars_news(browser)
+    hemisphere = D1(browser)
 
     # Run all scraping functions and store results in a dictionary
     data = {
@@ -19,7 +21,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemisphere" : hemisphere(browser)
     }
 
     # Stop webdriver and return data
@@ -96,6 +99,32 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def D1(browser):
+    # # D1: Scrape High-Resolution Mars’ Hemisphere Images and Titles
+    # ### Hemispheres
+    url = 'https://marshemispheres.com/'
+    browser.visit(url)
+    u = 0
+    while u < 4:
+        browser.find_by_tag("h3")[u].click()
+        browser.find_by_text("Sample").click()
+        browser.visit(url)
+        u = u + 1
+    #USE THIS FOR THE LIST BELOW
+    timon = soup(re.get(url).content, 'lxml')
+    # 2. Create a list to hold the images and titles.
+    # 3. Write code to retrieve the image urls and titles for each hemisphere.
+    f = 0
+    i = 1
+    draft = [{'img_url':browser.windows[i].url, 'title': timon.find_all('h3')[f].get_text()} for i in range(5) if i > 0 for f in range(4)]
+
+    hemisphere = draft[0:4]
+    hemisphere
+    # 5. Quit the browser
+    browser.quit()
+    return hemisphere
+
 
 if __name__ == "__main__":
 
