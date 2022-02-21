@@ -60,7 +60,7 @@
           <h2 class="text-center">Mars Hemispheres</h2>
         </div>
 
-        {{mars.img_url}}
+        {% for hemisphere in mars.hemispheres %}
         <div class="col-md-6">
           <div class="thumbnail">
             <img src="{{hemisphere.img_url | default('static/images/error.png', true)}}" alt="...">
@@ -69,7 +69,7 @@
             </div>
           </div>
         </div>
-        {{mars.title}}
+        {% endfor %}
       </div>
     </div>
   </body>

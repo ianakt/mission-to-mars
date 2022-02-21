@@ -3,17 +3,17 @@ from splinter import Browser
 from bs4 import BeautifulSoup as soup
 import pandas as pd
 import datetime as dt
-from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 import requests as re
 
 
 def scrape_all():
     # Initiate headless driver for deployment
-    executable_path = {'executable_path': GeckoDriverManager().install()}
-    browser = Browser('firefox', **executable_path, headless=True)
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=True)
 
     news_title, news_paragraph = mars_news(browser)
-    hemisphere = D1(browser)
+    
 
     # Run all scraping functions and store results in a dictionary
     data = {
@@ -22,7 +22,7 @@ def scrape_all():
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(),
-        "hemisphere" : hemisphere(browser)
+        "hemispheres" : hemisphere(browser)
     }
 
     # Stop webdriver and return data
@@ -100,7 +100,7 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
 
-def D1(browser):
+def hemisphere(browser):
     # # D1: Scrape High-Resolution Mars’ Hemisphere Images and Titles
     # ### Hemispheres
     url = 'https://marshemispheres.com/'
@@ -119,11 +119,10 @@ def D1(browser):
     i = 1
     draft = [{'img_url':browser.windows[i].url, 'title': timon.find_all('h3')[f].get_text()} for i in range(5) if i > 0 for f in range(4)]
 
-    hemisphere = draft[0:4]
-    hemisphere
+    hemisphere_image_urls = [draft[12],draft[9],draft[6],draft[3]]
     # 5. Quit the browser
     browser.quit()
-    return hemisphere
+    return hemisphere_image_urls
 
 
 if __name__ == "__main__":
